@@ -1,0 +1,169 @@
+// ppp.cpp : Defines the entry point for the console application.
+//
+
+#include "stdio.h"
+struct Number
+{
+	int n[100];
+	int sign;
+	int len; 
+};
+void printnumber(struct Number k)
+{
+	int i;
+	if(k.sign==-1)
+	{
+		printf("-");
+	}
+	for(i=0;i<k.len;i++)
+	{
+		printf("%d",k.n[i]);	
+	}
+	printf("\n");
+};
+
+int getnumber(struct Number *p,char *str,int offset)
+{
+	p->len=0;
+	if(str[offset]=='+')
+	{
+		p->sign=1;
+	}
+	else if(str[offset]=='-')
+	{
+		p->sign=-1;
+	}
+	else
+	{
+		p->sign=1;
+		p->n[0]=str[offset]-'0';
+		p->len++;
+	}
+	offset++;
+	while(str[offset]>='0' && str[offset]<='9')
+	{
+		p->n[p->len]=str[offset]-'0';
+		p->len++;
+		offset++;
+	}
+	return offset;
+	
+}
+void add(struct Number *n1,struct Number *n2,struct Number *r)
+{
+	int i,dlen,k,j;
+	struct Number *t;
+	if(n1->len < n2->len)
+	{
+		t=n1;
+		n1=n2;
+		n2=t;
+	}
+	r->len=n1->len;
+	for(i=0;i<n1->len;i++)
+	{
+		r->n[i]=n1->n[i]*n1->sign;
+	}
+	dlen=n1->len-n2->len;
+	for(i=0;i<n2->len;i++)
+	{
+		r->n[i+dlen]=r->n[i+dlen]+n2->n[i]*n2->sign;
+	}
+
+	r->sign=1;
+	for(int i=0;;)
+		{
+			if(r->n[i]==0)
+			{
+				for(int t=i;t<r->len;t++)
+				{
+					r->n[t]=r->n[t+1];
+				}
+			}
+			else
+			{
+				break;
+			}
+			r->len-=1;
+		}
+	if(r->n[0]<0)
+	{
+		r->sign=-1;
+	}
+	k=0;
+	for(i=r->len-1;i>=0;i--)
+	{
+		r->n[i]+=k;
+		if(r->n[i]*r->sign>0)
+		{
+			k=r->n[i]/10;
+			r->n[i]=r->n[i]%10*r->sign;
+		}
+		else if(r->n[i]*r->sign==0)
+		{
+		
+		}
+		else
+		{
+			k=-r->sign;
+			r->n[i]=(r->sign*10+r->n[i])*r->sign;
+		}
+	}
+
+	if(k!=0)
+	{
+		if(r->n[0]>=10)
+		{
+			r->len+=1;
+			int q=r->len;
+			for(j=r->len-1;j>0;q--,j--)
+			{
+				r->n[q]=r->n[j];
+			}
+			r->n[0]=1;
+		}
+		for(int i=0;;)
+		{
+			if(r->n[i]==0)
+			{
+				for(int t=i;t<r->len;t++)
+				{
+					r->n[t]=r->n[t+1];
+				}
+			}
+			else
+			{
+				break;
+			}
+			r->len-=1;
+		}
+
+	}
+	else
+	{
+
+	}
+}
+int main()
+{
+	struct Number a,b,r;
+	char str[1000],c;
+	int i;
+	while(scanf("%s",str)!=EOF)
+	{
+		i=getnumber(&a,str,0);
+		c=str[i];
+		getnumber(&b,str,i+1);
+		switch(c) 
+		{
+		case '+':add(&a,&b,&r);
+				break;
+		case '-':b.sign*=(-1);
+				add(&a,&b,&r);
+				break;
+		};
+		printnumber(r);
+	}
+	return 0;
+}
+
